@@ -1,4 +1,4 @@
-UMass Dining Hall Checker
+UMass Dining Hall tracker
 
 | Name | Github |
 |---|---|
