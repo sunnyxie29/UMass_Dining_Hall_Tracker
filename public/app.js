@@ -1,9 +1,14 @@
 const ITEMS_URL = '/menu-items';
-const DINING_HALLS = ['Worcester', 'Franklin', 'Berkshire', 'Hampshire'];
+const DINING_HALLS = [
+  { id: 1, name: 'Worcester' },
+  { id: 2, name: 'Franklin' },
+  { id: 3, name: 'Berkshire' },
+  { id: 4, name: 'Hampshire' },
+];
 
 const form = document.querySelector('#item-form');
 const list = document.querySelector('#items');
-const hallSelect = form.querySelector('select[name="diningHall"]');
+const hallSelect = form.querySelector('select[name="diningHallId"]');
 
 const timedFetch = (url, options = {}) =>
   fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
@@ -31,6 +36,18 @@ const fetchJSON = async (url, options) => {
   return body;
 };
 
+const getHallName = (id) =>
+  DINING_HALLS.find((hall) => hall.id === Number(id))?.name ?? 'Unknown hall';
+
+const toPayload = (formElement) => {
+  const data = new FormData(formElement);
+  return {
+    name: data.get('name'),
+    diningHallId: Number(data.get('diningHallId')),
+    section: data.get('section'),
+  };
+};
+
 const makeOption = (value, label) => {
   const option = document.createElement('option');
   option.value = value;
@@ -38,14 +55,14 @@ const makeOption = (value, label) => {
   return option;
 };
 
-const fillHallSelect = (select, selected = '') => {
+const fillHallSelect = (select, selectedId = '') => {
   const placeholder = makeOption('', 'Choose a dining hall');
   placeholder.disabled = true;
   select.replaceChildren(
     placeholder,
-    ...DINING_HALLS.map((hall) => makeOption(hall, hall)),
+    ...DINING_HALLS.map((hall) => makeOption(hall.id, hall.name)),
   );
-  select.value = selected;
+  select.value = selectedId;
 };
 
 const makeInput = (name, value, placeholder = '') => {
@@ -72,7 +89,7 @@ const fillDisplay = (display, item) => {
 
   const hall = document.createElement('span');
   hall.className = 'item-hall';
-  hall.textContent = item.diningHall;
+  hall.textContent = getHallName(item.diningHallId);
 
   const section = document.createElement('span');
   section.className = 'item-section';
@@ -85,7 +102,7 @@ const buildItem = (item) => {
   const li = document.createElement('li');
   li.dataset.id = list.children.length;
   li.dataset.name = item.name;
-  li.dataset.diningHall = item.diningHall;
+  li.dataset.diningHallId = item.diningHallId;
   li.dataset.section = item.section;
 
   const display = document.createElement('span');
@@ -105,7 +122,6 @@ const renumber = () => {
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const item = Object.fromEntries(new FormData(form));
   const button = form.querySelector('button');
 
   button.disabled = true;
@@ -113,7 +129,7 @@ form.addEventListener('submit', async (event) => {
     const saved = await fetchJSON(ITEMS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item),
+      body: JSON.stringify(toPayload(form)),
     });
     list.append(buildItem(saved));
     form.reset();
@@ -132,8 +148,8 @@ const startEdit = (li) => {
   editForm.className = 'edit-form';
 
   const hallPicker = document.createElement('select');
-  hallPicker.name = 'diningHall';
-  fillHallSelect(hallPicker, li.dataset.diningHall);
+  hallPicker.name = 'diningHallId';
+  fillHallSelect(hallPicker, li.dataset.diningHallId);
 
   const save = document.createElement('button');
   save.type = 'submit';
@@ -158,17 +174,15 @@ const startEdit = (li) => {
   editForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const item = Object.fromEntries(new FormData(editForm));
-
     save.disabled = true;
     try {
       const saved = await fetchJSON(`${ITEMS_URL}/${li.dataset.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        body: JSON.stringify(toPayload(editForm)),
       });
       li.dataset.name = saved.name;
-      li.dataset.diningHall = saved.diningHall;
+      li.dataset.diningHallId = saved.diningHallId;
       li.dataset.section = saved.section;
       fillDisplay(display, saved);
       editForm.replaceWith(display);
