@@ -1,26 +1,169 @@
-.home_page_body {
+.page_body {
   margin: 0;
 }
 
-.home_page_header {
+.page_header {
   background-color: #881c1c;
   color: white;
   padding: 20px;
 }
 
-.home_page_main {
+.page_main {
   padding: 20px;
 }
 
-.home_page_button {
+.page_message {
+  font-size: 1.25rem;
+  margin-top: 0;
+}
+
+.page_button {
   padding: 0.35rem 0.75rem;
   border-radius: 4px;
   background-color: #881c1c;
   color: white;
   text-decoration: none;
   display: inline-block;
+  margin-right: 10px;
 }
 
-.home_page_button:hover {
+.page_button:hover {
   background-color: #6b1515;
+}
+
+.hall-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.hall-card {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.item-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.item-form input {
+  padding: 0.35rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.item-form select {
+  padding: 0.35rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 1.5rem;
+  margin-left: 0;
+}
+
+.item-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.item-hall {
+  font-size: 0.85rem;
+  color: #666;
+  margin-left: 0.5rem;
+}
+
+.item-section {
+  font-size: 0.85rem;
+  color: #666;
+  margin-left: 0.5rem;
+}
+
+.item-display {
+  flex: 1;
+}
+
+.add-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #15803d;
+  border-radius: 4px;
+  background: white;
+  color: #15803d;
+  cursor: pointer;
+}
+
+.edit-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #0b6e99;
+  border-radius: 4px;
+  background: white;
+  color: #0b6e99;
+  cursor: pointer;
+}
+
+.delete-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #d33;
+  border-radius: 4px;
+  background: white;
+  color: #d33;
+  cursor: pointer;
+}
+
+.edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.edit-form input {
+  flex: 1;
+  padding: 0.35rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-form select {
+  flex: 1;
+  padding: 0.35rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-form button[type="submit"] {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #15803d;
+  border-radius: 4px;
+  background: white;
+  color: #15803d;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #d33;
+  border-radius: 4px;
+  background: white;
+  color: #d33;
+  cursor: pointer;
 }

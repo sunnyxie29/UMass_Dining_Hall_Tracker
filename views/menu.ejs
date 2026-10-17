@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="page_body">
+    <header class="page_header">
+      <h1><%= title %></h1>
+    </header>
+    <main class="page_main">
+      <form id="item-form" class="item-form">
+        <input type="text" name="name" placeholder="Name" />
+        <select name="diningHallId"></select>
+        <input type="text" name="section" placeholder="Section" />
+        <button class="add-btn" type="submit">Add item</button>
+      </form>
+      <ul id="items" class="item-list"></ul>
+      <a href="/" class="page_button">Back</a>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

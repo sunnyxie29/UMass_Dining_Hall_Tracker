@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="page_body">
+    <header class="page_header">
+      <h1><%= title %></h1>
+    </header>
+    <main class="page_main">
+      <ul class="hall-list">
+        <% dining_halls.forEach((hall) => { %>
+          <li class="hall-card"><%= hall.title %></li>
+        <% }); %>
+      </ul>
+      <a href="/" class="page_button">Back</a>
+    </main>
+  </body>
+</html>
