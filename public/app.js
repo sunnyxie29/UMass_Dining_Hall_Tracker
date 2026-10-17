@@ -218,3 +218,14 @@ list.addEventListener('click', async (event) => {
 });
 
 fillHallSelect(hallSelect);
+
+const loadItems = async () => {
+  try {
+    const items = await fetchJSON(ITEMS_URL);
+    items.forEach((item) => list.append(buildItem(item)));
+  } catch (error) {
+    alert(`Could not load items. ${error.message}`);
+  }
+};
+
+loadItems();

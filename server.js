@@ -1,8 +1,11 @@
 import express from "express";
+import menuItemRoutes from './routes/menuItemRoutes.js';
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const PORT = 3000;
 
+app.use(express.json());
 const dining_halls = [
   { title: "Worcester Dining Hall" },
   { title: "Franklin Dining Hall" },
@@ -26,6 +29,9 @@ app.get("/halls", (req, res) => {
     </ul>
   `);
 });
+
+app.use("/menu-items", menuItemRoutes); 
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
