@@ -1,0 +1,26 @@
+.home_page_body {
+  margin: 0;
+}
+
+.home_page_header {
+  background-color: #881c1c;
+  color: white;
+  padding: 20px;
+}
+
+.home_page_main {
+  padding: 20px;
+}
+
+.home_page_button {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  background-color: #881c1c;
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.home_page_button:hover {
+  background-color: #6b1515;
+}
