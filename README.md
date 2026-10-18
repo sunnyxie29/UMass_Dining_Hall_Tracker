@@ -2,13 +2,14 @@
 
 A web app for tracking dining hall menu items across campus.
 
+## Setup Instructions:
 ```bash
 gh repo clone sunnyxie29/UMass_Dining_Hall_Tracker
 cd UMass_Dining_Hall_Tracker
 npm install
 npm install express
 npm install ejs
-node server.js
+npm start
 ```
 
 Then open http://localhost:3000
@@ -49,8 +50,8 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 
 ### How to try it
 
-1. After cloning the repository, cd into it and run the following command in your terminal: `npm install ejs`
-2. Then, run this command in your terminal: `npm start`
+1. Follow the setup instructions at the top of this page.
+2. Then, run this command in your terminal: `npm start`.
 3. Open `http://localhost:3000` in your browser.
 4. Use the traversal buttons at the bottom of each page to go between each page (home page, halls page, and menu page).
 5. On the menu page, you may add, edit, and delete food items freely.
