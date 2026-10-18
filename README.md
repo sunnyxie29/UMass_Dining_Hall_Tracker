@@ -30,7 +30,7 @@ Working Agreement:
 Project Domain:
 We want to make a dining hall tracker similar to the official UMass one. This directly benefits everyone by being able to use our computers to check the dining halls (how busy they are currently, the day's menu, etc.) rather than our phones. While the phone does have some upsides, sometimes using your phone just isn't an option. So, we want to create this website to help those who need it. Beyond the classroom, it just overall helps the student body by creating a more convenient way to check the dining hall statuses.
 
-Git clone the repository to your own computer in a contianer to be used. this project is a tracker made to be a web version of the umass dining hall app on students phones. it will display food items and hours for specfic dining halls to a users wishes. to run it, run the following lines: npm pkg set type=module, and npm install express inside the repository. once that is done, cd into the repository and type npm start.
+Git clone the repository to your own computer in a container to be used. this project is a tracker made to be a web version of the UMass dining hall app on students phones. it will display food items and hours for specific dining halls to a users wishes. to run it, cd into the repository, run npm install ejs in your terminal, and then run npm start to start the server locally for you to access in your browser.
 
 ## Feature: Menu Items
 
@@ -48,8 +48,11 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 
 ### How to try it
 
-1. Start the server with `node server.js` and open http://localhost:3000[/page path].
-   (to be finished)
+1. After cloning the repository, cd into it and run the following command in your terminal: `npm install ejs`
+2. Then, run this command in your terminal: `npm start`
+3. Open `http://localhost:3000` in your browser.
+4. Use the traversal buttons at the bottom of each page to go between each page (home page, halls page, and menu page).
+5. On the menu page, you may add, edit, and delete food items freely.
 
 ### Routes
 
