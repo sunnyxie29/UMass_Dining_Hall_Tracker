@@ -1,4 +1,4 @@
-# UMass Dining Hall tracker
+# UMass Dining Hall Tracker
 
 A web app for tracking dining hall menu items across campus.
 
@@ -68,7 +68,7 @@ All errors are returned as JSON in the form `{ "error": "message" }`, and the pa
 
 ### System Diagram
 
-(systemDiagrams/sprint2.png)
+![System Diagram Image](./systemDiagrams/sprint2.png)
 
 ### Design Decisions
 
