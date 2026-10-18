@@ -3,7 +3,10 @@ A web app for tracking dining hall menu items across campus.
 
 ```bash
 gh repo clone sunnyxie29/UMass_Dining_Hall_Tracker
+cd UMass_Dining_Hall_Tracker
 npm install
+npm install express
+npm install ejs
 node server.js
 ```
 
