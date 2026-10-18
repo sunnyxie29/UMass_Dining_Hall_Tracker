@@ -1,4 +1,5 @@
-#UMass Dining Hall tracker
+# UMass Dining Hall tracker
+
 A web app for tracking dining hall menu items across campus.
 
 ```bash
@@ -64,7 +65,7 @@ All errors are returned as JSON in the form `{ "error": "message" }`, and the pa
 
 ### System Diagram
 
-(to be finished)
+(systemDiagrams/sprint2.png)
 
 ### Design Decisions
 
