@@ -1,6 +1,7 @@
 import express from "express";
 import menuItemRoutes from "./routes/menuItemRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import connectDB from "./config/database.js";
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +11,7 @@ app.set("views", "views");
 app.use(express.static("public"));
 
 app.use(express.json());
+
 const dining_halls = [
   { title: "Worcester Dining Hall" },
   { title: "Franklin Dining Hall" },
@@ -36,6 +38,17 @@ app.get("/halls", (req, res) => {
 app.use("/menu-items", menuItemRoutes);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
