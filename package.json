@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand"
   },
   "dependencies": {
     "ejs": "^7.0.1",
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "mongoose": "^9.11.4"
   },
   "description": "| Name | Github | |---|---| | Sunny Xie | sunnyxie29 | | Thomas Draghi | umassmilker| | Mark Kulmizev | mkulmizev |",
   "main": "server.js",
@@ -21,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/sunnyxie29/sprint/issues"
   },
-  "homepage": "https://github.com/sunnyxie29/sprint#readme"
+  "homepage": "https://github.com/sunnyxie29/sprint#readme",
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
 }
