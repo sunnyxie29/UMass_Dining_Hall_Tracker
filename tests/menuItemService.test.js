@@ -93,16 +93,16 @@ describe('updateItem', () => {
     const saved = { ...validInput, section: 'Salad Bar' };
     repository.update.mockResolvedValue(saved);
 
-    await expect(service.updateItem('3', { ...validInput, section: 'Salad Bar' })).resolves.toBe(saved);
-    expect(repository.update).toHaveBeenCalledWith(3, { ...validInput, section: 'Salad Bar' });
+    await expect(service.updateItem('abc123', { ...validInput, section: 'Salad Bar' })).resolves.toBe(saved);
+    expect(repository.update).toHaveBeenCalledWith('abc123', { ...validInput, section: 'Salad Bar' });
   });
 
   test('normalizes the input the same way create does', async () => {
     repository.update.mockResolvedValue({});
 
-    await service.updateItem('1', { name: '  Soup ', diningHallId: '4', section: ' Deli ' });
+    await service.updateItem('abc123', { name: '  Soup ', diningHallId: '4', section: ' Deli ' });
 
-    expect(repository.update).toHaveBeenCalledWith(1, {
+    expect(repository.update).toHaveBeenCalledWith('abc123', {
       name: 'Soup',
       diningHallId: 4,
       section: 'Deli',
@@ -123,8 +123,8 @@ describe('deleteItem', () => {
   test('removes the item', async () => {
     repository.remove.mockResolvedValue(true);
 
-    await expect(service.deleteItem('2')).resolves.toBeUndefined();
-    expect(repository.remove).toHaveBeenCalledWith(2);
+    await expect(service.deleteItem('abc123')).resolves.toBeUndefined();
+    expect(repository.remove).toHaveBeenCalledWith('abc123');
   });
 
   test('rejects with a 404 when the repository finds nothing to remove', async () => {
