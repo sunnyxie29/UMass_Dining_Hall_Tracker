@@ -5,17 +5,17 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body class="page_body">
-    <header class="page_header">
-      <h1><%= title %></h1>
+  <body>
+    <header class="bg-umass text-white p-5">
+      <h1 class="text-2xl font-bold"><%= title %></h1>
     </header>
-    <main class="page_main">
-      <ul class="hall-list">
+    <main class="p-5">
+      <ul class="flex flex-wrap gap-2 mb-4">
         <% dining_halls.forEach((hall) => { %>
-          <li class="hall-card"><%= hall.title %></li>
+          <li class="p-3 border border-gray-200 rounded font-medium"><%= hall.title %></li>
         <% }); %>
       </ul>
-      <a href="/" class="page_button">Back</a>
+      <a href="/" class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5">Back</a>
     </main>
   </body>
 </html>

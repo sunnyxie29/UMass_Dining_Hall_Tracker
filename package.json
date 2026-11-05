@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/style.css"
   },
   "dependencies": {
     "ejs": "^7.0.1",
@@ -25,6 +26,8 @@
   },
   "homepage": "https://github.com/sunnyxie29/sprint#readme",
   "devDependencies": {
-    "jest": "^30.5.2"
+    "@tailwindcss/cli": "^4.1.0",
+    "jest": "^30.5.2",
+    "tailwindcss": "^4.1.0"
   }
 }

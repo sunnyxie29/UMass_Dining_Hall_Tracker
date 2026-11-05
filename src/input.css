@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  --color-umass: #881c1c;
+  --color-umass-dark: #6b1515;
+}
+
+@layer components {
+  .item-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .item-hall {
+    font-size: 0.85rem;
+    color: #666;
+    margin-left: 0.5rem;
+  }
+
+  .item-section {
+    font-size: 0.85rem;
+    color: #666;
+    margin-left: 0.5rem;
+  }
+
+  .item-display {
+    flex: 1;
+  }
+
+  .edit-btn {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #0b6e99;
+    border-radius: 4px;
+    background: white;
+    color: #0b6e99;
+    cursor: pointer;
+  }
+
+  .edit-btn:hover {
+    background: #e8f4f9;
+  }
+
+  .delete-btn {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #d33;
+    border-radius: 4px;
+    background: white;
+    color: #d33;
+    cursor: pointer;
+  }
+
+  .delete-btn:hover {
+    background: #fdecec;
+  }
+
+  .edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .edit-form input {
+    flex: 1;
+    padding: 0.35rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .edit-form select {
+    flex: 1;
+    padding: 0.35rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .edit-form button[type="submit"] {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #15803d;
+    border-radius: 4px;
+    background: white;
+    color: #15803d;
+    cursor: pointer;
+  }
+
+  .edit-form button[type="submit"]:hover {
+    background: #f0fdf4;
+  }
+
+  .cancel-btn {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #d33;
+    border-radius: 4px;
+    background: white;
+    color: #d33;
+    cursor: pointer;
+  }
+
+  .cancel-btn:hover {
+    background: #fdecec;
+  }
+}
