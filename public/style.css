@@ -167,3 +167,12 @@
   color: #d33;
   cursor: pointer;
 }
+
+.edit-form[hidden] {
+  display: none;
+}
+
+.form-error {
+  color: #d33;
+  margin-top: 0;
+}

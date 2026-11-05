@@ -2,23 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}' />
     <title><%= title %></title>
     <link rel="stylesheet" href="/style.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   </head>
   <body class="page_body">
     <header class="page_header">
       <h1><%= title %></h1>
     </header>
     <main class="page_main">
-      <form id="item-form" class="item-form">
+      <form id="item-form" class="item-form" hx-post="/menu-items" hx-target="#items" hx-swap="innerHTML" hx-on::after-request="if (event.detail.successful) this.reset()">
         <input type="text" name="name" placeholder="Name" />
-        <select name="diningHallId"></select>
+        <select name="diningHallId">
+          <option value="" disabled selected>Choose a dining hall</option>
+          <% halls.forEach((hall) => { %>
+            <option value="<%= hall.id %>"><%= hall.name %></option>
+          <% }); %>
+        </select>
         <input type="text" name="section" placeholder="Section" />
         <button class="add-btn" type="submit">Add item</button>
       </form>
-      <ul id="items" class="item-list"></ul>
+      <p id="form-error" class="form-error" role="alert"></p>
+      <ul id="items" class="item-list" hx-get="/menu-items" hx-trigger="load" hx-target="this" hx-swap="innerHTML"></ul>
       <a href="/" class="page_button">Back</a>
     </main>
-    <script src="/app.js" defer></script>
   </body>
 </html>

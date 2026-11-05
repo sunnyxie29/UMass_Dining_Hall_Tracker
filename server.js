@@ -1,6 +1,7 @@
 import express from "express";
 import menuItemRoutes from "./routes/menuItemRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { DINING_HALLS } from "./dtos/menuitemdto.js";
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +11,7 @@ app.set("views", "views");
 app.use(express.static("public"));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 const dining_halls = [
   { title: "Worcester Dining Hall" },
   { title: "Franklin Dining Hall" },
@@ -26,7 +28,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/menu", (req, res) => {
-  res.render("menu", { title: "Today's Menu" });
+  res.render("menu", { title: "Today's Menu", halls: DINING_HALLS });
 });
 
 app.get("/halls", (req, res) => {

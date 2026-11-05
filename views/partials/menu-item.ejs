@@ -1,0 +1,20 @@
+<li id="item-<%= item.id %>">
+  <span class="item-display">
+    <strong class="item-name"><%= item.name %></strong>
+    <span class="item-hall"><%= item.hallName %></span>
+    <span class="item-section"><%= item.section %></span>
+  </span>
+  <form class="edit-form" hidden hx-put="/menu-items/<%= item.id %>" hx-target="closest li" hx-swap="outerHTML">
+    <input type="text" name="name" value="<%= item.name %>" placeholder="Item name" />
+    <select name="diningHallId">
+      <% halls.forEach((hall) => { %>
+        <option value="<%= hall.id %>" <%= hall.id === item.diningHallId ? 'selected' : '' %>><%= hall.name %></option>
+      <% }); %>
+    </select>
+    <input type="text" name="section" value="<%= item.section %>" placeholder="Section" />
+    <button type="submit">Save</button>
+    <button type="button" class="cancel-btn" hx-on:click="const row = this.closest('li'); row.querySelector('.item-display').hidden = false; row.querySelector('.edit-form').hidden = true; row.querySelectorAll('.edit-btn, .delete-btn').forEach((b) => b.hidden = false)">Cancel</button>
+  </form>
+  <button type="button" class="edit-btn" hx-on:click="const row = this.closest('li'); row.querySelector('.item-display').hidden = true; row.querySelector('.edit-form').hidden = false; row.querySelectorAll('.edit-btn, .delete-btn').forEach((b) => b.hidden = true)">Edit</button>
+  <button type="button" class="delete-btn" hx-delete="/menu-items/<%= item.id %>" hx-target="#items" hx-swap="innerHTML" hx-confirm="Delete this item?">Delete</button>
+</li>
