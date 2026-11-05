@@ -11,21 +11,57 @@
     <header class="bg-umass text-white p-5">
       <h1 class="text-2xl font-bold"><%= title %></h1>
     </header>
-    <main class="page_main">
-      <form id="item-form" class="item-form" hx-post="/menu-items" hx-target="#items" hx-swap="innerHTML" hx-on::after-request="if (event.detail.successful) this.reset()">
-        <input type="text" name="name" placeholder="Name" />
-        <select name="diningHallId">
+    <main class="p-5">
+      <form
+        id="item-form"
+        class="flex flex-col gap-3 mb-6 sm:flex-row sm:flex-wrap sm:items-end"
+        hx-post="/menu-items"
+        hx-target="#items"
+        hx-swap="innerHTML"
+        hx-on::after-request="if (event.detail.successful) this.reset()"
+      >
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          class="p-1.5 border border-gray-300 rounded"
+        />
+        <select
+          name="diningHallId"
+          class="p-1.5 border border-gray-300 rounded"
+        >
           <option value="" disabled selected>Choose a dining hall</option>
           <% halls.forEach((hall) => { %>
             <option value="<%= hall.id %>"><%= hall.name %></option>
           <% }); %>
         </select>
-        <input type="text" name="section" placeholder="Section" />
-        <button class="add-btn" type="submit">Add item</button>
+        <input
+          type="text"
+          name="section"
+          placeholder="Section"
+          class="p-1.5 border border-gray-300 rounded"
+        />
+        <button
+          class="px-2.5 py-1.5 border border-green-700 text-green-700 bg-white hover:bg-green-50 rounded cursor-pointer"
+          type="submit"
+        >
+          Add item
+        </button>
       </form>
-      <p id="form-error" class="form-error" role="alert"></p>
-      <ul id="items" class="item-list" hx-get="/menu-items" hx-trigger="load" hx-target="this" hx-swap="innerHTML"></ul>
-      <a href="/" class="page_button">Back</a>
+      <p id="form-error" class="mb-4 text-red-600" role="alert"></p>
+      <ul
+        id="items"
+        class="item-list flex flex-col gap-2 mb-6"
+        hx-get="/menu-items"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      ></ul>
+      <a
+        href="/"
+        class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
+        >Back</a
+      >
     </main>
   </body>
 </html>
