@@ -2,6 +2,7 @@ import express from "express";
 import menuItemRoutes from "./routes/menuItemRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { DINING_HALLS } from "./dtos/menuitemdto.js";
+import connectDB from "./config/database.js";
 
 const app = express();
 const PORT = 3000;
