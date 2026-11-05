@@ -3,12 +3,14 @@
 A web app for tracking dining hall menu items across campus.
 
 ## Setup Instructions:
+
 ```bash
+gh repo clone timdrichards/cargo
+(follows the instruction in readme to setup the coding environment, including opening dev container and change .env.example to .env)
+cd work
 gh repo clone sunnyxie29/UMass_Dining_Hall_Tracker
 cd UMass_Dining_Hall_Tracker
 npm install
-npm install express
-npm install ejs
 npm start
 ```
 
@@ -21,22 +23,25 @@ Requires Node.js.
 | Thomas Draghi | umassmilker |
 | Mark Kulmizev | mkulmizev   |
 
-Working Agreement:
+## SPRINT 3:
 
-1. We will communicate via the iMessage group chat that we created.
+### Design Decisions:
 
-2. "Done" means that the code properly functions without throwing errors and doesn't conflict with other files (naming semantics, inputs/outputs match, etc). It doesn't even have to be 100% completed, just work as you go and commit what is needed.
+Sunny Xie:
+We decided to use Mongoose to migrate our data from JSON files to MongoDB. Another option would have been to continue storing data in JSON files and manually manage updates to those files. We chose MongoDB because it offers more automatically generated IDs and built-in database operations. This will make it easier to add search functionality in the future, and editing or deleting individual menu items will no longer require renumbering. Additionally, this change can be implemented quickly because we previously organized the backend code into layers, so we no longer need to rewrite the entire backend.
 
-3. Disagreements will be solved by kindly talking with other group members and calmly explaining what is wrong.
+We also decided to use Jest to test the service layer and to mock the repository during unit testing instead of connecting to a MongoDB database. Another option would have been to run tests against the actual database. We chose to mock the repository because this allows us to test business logic and validation rules independently of database operations. Tests run faster and do not depend on existing data.
 
-Project Domain:
-We want to make a dining hall tracker similar to the official UMass one. This directly benefits everyone by being able to use our computers to check the dining halls (how busy they are currently, the day's menu, etc.) rather than our phones. While the phone does have some upsides, sometimes using your phone just isn't an option. So, we want to create this website to help those who need it. Beyond the classroom, it just overall helps the student body by creating a more convenient way to check the dining hall statuses.
+Mark Kulmizev:
+One decision we had to make when going about the tailwind implementation was reformatting the pages to make the process of handling the sm breakpoints easier. In the unit 15 code, the links to go to the other pages are just text and are in the header. In our approach, they are buttons located at the bottom of the page. By switching to this kind of format, the implementation of how we handle the sm breakpoints would be much easier since we could then just write similar code to what we have learned through the notes app. Reformatting in this way would also make our page look a bit cleaner/less cluttered, since it would free up some space at the bottom by removing the buttons, but this isn't significant since the pages already aren't cluttered. We decided to stick with our approach with the buttons, as we believe that it is more user friendly. Some users may find that buttons are more recognizable as something that can be interacted with rather than text, so we chose to stick with what we had. If we switched to the format where the links to the other pages were just text next to the title, some users would possibly not recognize that the lines of text can be interacted with to navigate to the other pages. Even if we turned the text into buttons next to the title, it wouldn't look as neat compared to our final approach, as the buttons would be on a maroon background instead of a white one, which would make them pop out less.
 
-Git clone the repository to your own computer in a container to be used. this project is a tracker made to be a web version of the UMass dining hall app on students phones. it will display food items and hours for specific dining halls to a users wishes. to run it, cd into the repository, run npm install ejs in your terminal, and then run npm start to start the server locally for you to access in your browser.
+Thomas Draghi:
 
-## Feature: Menu Items
+## SPRINT 2:
 
-### What it does
+### Feature: Menu Items
+
+#### What it does
 
 Users can add dining hall menu items, view them in a list, edit them, and delete them. Each item has three fields (this feature was designed for admins, common users will only have access to the view version):
 
@@ -48,7 +53,7 @@ Users can add dining hall menu items, view them in a list, edit them, and delete
 
 Items are saved in `data/menu-items.json`, so they are still there after the server restarts.
 
-### How to try it
+#### How to try it
 
 1. Follow the setup instructions at the top of this page.
 2. Then, run this command in your terminal: `npm start`.
@@ -56,7 +61,7 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 4. Use the traversal buttons at the bottom of each page to go between each page (home page, halls page, and menu page).
 5. On the menu page, you may add, edit, and delete food items freely.
 
-### Routes
+#### Routes
 
 | Method | Path            | Purpose                                         | Success | Errors                           |
 | ------ | --------------- | ----------------------------------------------- | ------- | -------------------------------- |
@@ -112,7 +117,7 @@ All repository and service dependencies are mocked with `jest.unstable_mockModul
 
 ![System Diagram Image](./systemDiagrams/sprint2.png)
 
-### Design Decisions
+#### Design Decisions
 
 Sunny Xie:
 We’ve designed the repository to be the sole component that reads from and writes to the `data/menu-items.json` file, rather than having the service call `fs` directly. An alternative approach could reduce the number of files: the service reads the file, applies rules, and then writes it back. While this approach works for JSON files, it blurs the distinction between service rules and the location where data is stored. If our team were to migrate to MongoDB in the future, not only would the storage code need to be rewritten, but the server-side code would also have to be rewritten, and we would be unable to test and validate the rules without access to the actual files. With the repository boundary design, however, when the storage method changes, only that file changes, while the server-side code remains unchanged. The cost is one additional file and one extra function call per operation, but I believe this cost is negligible compared to the flexibility we gain.
