@@ -25,6 +25,47 @@ Requires Node.js.
 
 ## SPRINT 3:
 
+### HTMX Interaction
+
+The menu page no longer builds its list with hand-written `fetch` calls and DOM updates. `public/app.js` is deleted. Adding, editing, and deleting items are all done with HTMX (`hx-*` attributes in the markup), and the server answers each request with an HTML fragment that HTMX swaps into the page. HTMX is loaded from a CDN, so there is nothing extra to install.
+
+How to see it: run `npm start`, open `http://localhost:3000/menu`, and use the page. Nothing reloads. In the browser's Network tab, each action is a request answered with HTML rather than JSON.
+
+| Action        | Element                 | Attributes                                                            | Server response                                  |
+| ------------- | ----------------------- | --------------------------------------------------------------------- | ------------------------------------------------ |
+| Load the list | `<ul id="items">`       | `hx-get="/menu-items" hx-trigger="load"`                              | `partials/menu-items.ejs`, one row per item      |
+| Add           | `#item-form`            | `hx-post="/menu-items" hx-target="#items"`                            | The refreshed list (201)                         |
+| Edit          | the row's inline form   | `hx-put="/menu-items/:id" hx-target="closest li" hx-swap="outerHTML"` | The single updated row, `partials/menu-item.ejs` |
+| Delete        | the row's Delete button | `hx-delete="/menu-items/:id" hx-target="#items" hx-confirm`           | The refreshed list                               |
+| Show an error | `#form-error`           | `HX-Retarget` and `HX-Reswap` response headers                        | The error message as text (400, 404)             |
+
+How it works with the existing layers:
+
+- The HTMX work changes the controller, the error handler, the views, and `server.js`. The routes and the service are not changed by it. The controller checks for the `HX-Request: true` header that HTMX sends: if it is there, the controller renders a partial, and if it is not, it returns JSON with the same status codes as before.
+- Errors from the service go through the same error handler. For an HTMX request it renders `partials/error.ejs` and tells HTMX to put it in `#form-error` instead of the list, so a failed save shows its message in the page and leaves the list alone.
+- Every successful list or row response also carries an out-of-band element that empties `#form-error`, so an old error disappears after the next successful action.
+- The dining hall dropdown options are rendered by the server from the DTO's `DINING_HALLS`, so the hall list no longer has a second copy in client-side JavaScript.
+
+Client-facing id that assumed an array position: the old `app.js` stored each row's id as its position in the list (`li.dataset.id = list.children.length`) and re-numbered every row after a delete, because the ids the server understood were array positions. Now the server renders each row's id into its `hx-put` and `hx-delete` URLs, and add and delete respond with the whole refreshed list, so nothing on the client has to track a position. The controller uses the item's `id`, then its `_id`, and only falls back to the array position when neither exists, so the views use the real MongoDB id once the repository returns it.
+
+### Tests
+
+Run them with:
+
+```bash
+npm install
+npm test
+```
+
+The repository and service are mocked with `jest.unstable_mockModule`, so no files or database are touched.
+
+| Test file                        | What it covers                                                                                                                                                                                                                                                                                                  |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/menuItemService.test.js`  | Every service rule: name required (missing, empty, whitespace), dining hall must be 1 to 4 (missing, empty, out of range, non-numeric), section required (missing, empty, whitespace). Also trimming, converting form strings like `"3"` to numbers, and the 404 for update and delete of a missing item. |
+| `tests/menuItemController.test.js` | A request with `HX-Request` gets the right partial and status, a request without it still gets JSON, ids come from the item or its position, and service errors reach `next`.                                                                                                                                |
+| `tests/errorHandler.test.js`     | JSON errors for plain requests, a retargeted HTML error for HTMX requests, and the generic message for a 500.                                                                                                                                                                                                   |
+| `tests/menuItemViews.test.js`    | The rendered partials contain the expected `hx-delete`, `hx-put`, and `hx-target` values, preselect the right hall, escape item text, and clear the error area.                                                                                                                                                |
+
 ### Design Decisions:
 
 Sunny Xie:
@@ -36,6 +77,7 @@ Mark Kulmizev:
 One decision we had to make when going about the tailwind implementation was reformatting the pages to make the process of handling the sm breakpoints easier. In the unit 15 code, the links to go to the other pages are just text and are in the header. In our approach, they are buttons located at the bottom of the page. By switching to this kind of format, the implementation of how we handle the sm breakpoints would be much easier since we could then just write similar code to what we have learned through the notes app. Reformatting in this way would also make our page look a bit cleaner/less cluttered, since it would free up some space at the bottom by removing the buttons, but this isn't significant since the pages already aren't cluttered. We decided to stick with our approach with the buttons, as we believe that it is more user friendly. Some users may find that buttons are more recognizable as something that can be interacted with rather than text, so we chose to stick with what we had. If we switched to the format where the links to the other pages were just text next to the title, some users would possibly not recognize that the lines of text can be interacted with to navigate to the other pages. Even if we turned the text into buttons next to the title, it wouldn't look as neat compared to our final approach, as the buttons would be on a maroon background instead of a white one, which would make them pop out less.
 
 Thomas Draghi:
+For the HTMX conversion, we decided that adding or deleting an item makes the server send back the whole refreshed list, while editing an item sends back only the one updated row. We decided this because our item ids started out as positions in the list, so after a delete every row below it moves up one place, and a page that only removed one row would be left with stale ids in the Edit and Delete buttons of the rows after it. Rebuilding the list from the server means every id on the page is correct after each action, and it let me delete the `renumber` code that `app.js` needed. The alternative of returning only the new row on add and an empty response on delete can still be considered valid though, as it sends less HTML and leaves the rest of the page alone, which would matter for a very long list. Therefore, we sacrifice that smaller response in order to keep the client from ever tracking ids itself, as the menu is short enough that re-rendering it costs very little. Now that the ids are real MongoDB ids, the one-row version would also be safe, so it would be the better choice if the list grew large.
 
 ## SPRINT 2:
 
@@ -72,48 +114,7 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 
 All errors are returned as JSON in the form `{ "error": "message" }`, and the page shows the message to the user.
 
-### HTMX Interaction (Sprint 3)
-
-The menu page no longer builds its list with hand-written `fetch` calls and DOM updates. `public/app.js` is deleted. Adding, editing, and deleting items are all done with HTMX (`hx-*` attributes in the markup), and the server answers each request with an HTML fragment that HTMX swaps into the page. It is loaded from a CDN, so there is nothing extra to install.
-
-How to see it: run `npm start`, open `http://localhost:3000/menu`, and use the page. Nothing reloads. In the browser's Network tab, each action is a request answered with HTML rather than JSON.
-
-| Action | Element | Attributes | Server response |
-| ------ | ------- | ---------- | --------------- |
-| Load the list | `<ul id="items">` | `hx-get="/menu-items" hx-trigger="load"` | `partials/menu-items.ejs`, one row per item |
-| Add | `#item-form` | `hx-post="/menu-items" hx-target="#items"` | The refreshed list (201) |
-| Edit | the row's inline form | `hx-put="/menu-items/:id" hx-target="closest li" hx-swap="outerHTML"` | The single updated row `partials/menu-item.ejs` |
-| Delete | the row's Delete button | `hx-delete="/menu-items/:id" hx-target="#items" hx-confirm` | The refreshed list |
-| Show an error | `#form-error` | `HX-Retarget` and `HX-Reswap` response headers | The error message as text (400, 404) |
-
-How it works with the existing layers:
-
-- The routes, service, and repository are untouched. The controller checks for the `HX-Request: true` header that HTMX sends: if it is there, the controller renders a partial, and if it is not, it returns the same JSON and status codes as before. The routes table above still describes the JSON behavior.
-- Errors from the service go through the same error handler. For an HTMX request it renders `partials/error.ejs` and tells HTMX to put it in `#form-error` instead of the list, so a failed save shows its message in the page and leaves the list alone.
-- Every successful list or row response also carries an out-of-band element that empties `#form-error`, so an old error disappears after the next successful action.
-- The dining hall dropdown options are rendered by the server from the DTO's `DINING_HALLS`, so the hall list no longer has a second copy in client-side JavaScript.
-
-Client-facing id that assumed an array position: the old `app.js` stored each row's id as its position in the list (`li.dataset.id = list.children.length`) and re-numbered every row after a delete, because the server's ids were array positions. The server now renders each row's id into its `hx-put` and `hx-delete` URLs. Add and delete respond with the whole refreshed list, so ids are always rebuilt by the server and nothing on the client has to track a position. The controller uses `item.id`, then `item._id`, and only falls back to the array position, so the views do not change when the repository starts returning real MongoDB ids.
-
-### Tests (Sprint 3)
-
-Run them with:
-
-```bash
-npm install
-npm test
-```
-
-All repository and service dependencies are mocked with `jest.unstable_mockModule`, so no files or database are touched.
-
-| Test file | What it covers |
-| --------- | -------------- |
-| `tests/menuItemService.test.js` | Every service rule: name required (missing, empty, whitespace), dining hall must be 1 to 4 (missing, empty, out of range, non-numeric), section required (missing, empty, whitespace). Also trimming, converting form strings like `"3"` to numbers, and the 404 for update and delete of a missing item. |
-| `tests/menuItemController.test.js` | A request with `HX-Request` gets the right partial and status, a request without it still gets JSON, ids come from the item or its position, and service errors reach `next`. |
-| `tests/errorHandler.test.js` | JSON errors for plain requests, a retargeted HTML error for HTMX requests, and the generic message for a 500. |
-| `tests/menuItemViews.test.js` | The rendered partials contain the expected `hx-delete`, `hx-put`, and `hx-target` values, preselect the right hall, escape item text, and clear the error area. |
-
-### System Diagram
+#### System Diagram
 
 ![System Diagram Image](./systemDiagrams/sprint2.png)
 
@@ -126,4 +127,3 @@ Thomas Draghi: For our menu item DTO and app.js, we decided to represent each di
 
 Mark Kumizev:
 For our menu.ejs template, we decided to make each item's dining hall and section values appear less significant (did this by making the font smaller, made the text more gray) as compared to the actual name of the dish. We decided to do this because if the items' every field had the same styling the list, the items would basically appear as just being sentences (for example: Chicken Tenders Worcester Lunch). Therefore, in an effort to present each item in a more clean way, we went down this route. The alternative of keeping the styling the same across all fields can still be considered as being valid though, as all the fields carry important information and we don't wanna give an impression that this isn't the case. Therefore, we sacrifice this way of preventing that misconception in order to present the items in a more clean way, as it should already be obvious that all fields carry important information.
-  
