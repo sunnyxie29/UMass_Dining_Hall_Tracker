@@ -2,8 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}' />
     <title><%= title %></title>
     <link rel="stylesheet" href="/style.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   </head>
   <body>
     <header class="bg-umass text-white p-5">
@@ -13,6 +15,10 @@
       <form
         id="item-form"
         class="flex flex-col gap-3 mb-6 sm:flex-row sm:flex-wrap sm:items-end"
+        hx-post="/menu-items"
+        hx-target="#items"
+        hx-swap="innerHTML"
+        hx-on::after-request="if (event.detail.successful) this.reset()"
       >
         <input
           type="text"
@@ -23,7 +29,12 @@
         <select
           name="diningHallId"
           class="p-1.5 border border-gray-300 rounded"
-        ></select>
+        >
+          <option value="" disabled selected>Choose a dining hall</option>
+          <% halls.forEach((hall) => { %>
+            <option value="<%= hall.id %>"><%= hall.name %></option>
+          <% }); %>
+        </select>
         <input
           type="text"
           name="section"
@@ -37,13 +48,20 @@
           Add item
         </button>
       </form>
-      <ul id="items" class="item-list flex flex-col gap-2 mb-6"></ul>
+      <p id="form-error" class="mb-4 text-red-600" role="alert"></p>
+      <ul
+        id="items"
+        class="item-list flex flex-col gap-2 mb-6"
+        hx-get="/menu-items"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      ></ul>
       <a
         href="/"
         class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
         >Back</a
       >
     </main>
-    <script src="/app.js" defer></script>
   </body>
 </html>
