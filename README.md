@@ -66,9 +66,24 @@ The repository and service are mocked with `jest.unstable_mockModule`, so no fil
 | `tests/errorHandler.test.js`       | JSON errors for plain requests, a retargeted HTML error for HTMX requests, and the generic message for a 500.                                                                                                                                                                                             |
 | `tests/menuItemViews.test.js`      | The rendered partials contain the expected `hx-delete`, `hx-put`, and `hx-target` values, preselect the right hall, escape item text, and clear the error area.                                                                                                                                           |
 
-## Restyle with Tailwind
+### Restyle with Tailwind
 
 With the implementation of Tailwind, we we're able to it make so our pages are user friendly on phone-sized screens (375 px) and not just regular sized computer screens (1280 px). When a smaller screen size is detected, the page automatically adjusts by making the interactable portions of the page (as well as the list of the dining halls on the halls page) be stacked vertically on top of each other instead of being side by side. On top of making these adjustments on smaller sized screens to make them usable, some smaller design choices were implemented. All of the buttons now appear as a different color when they are being hovered, not just the reference buttons. Besides that, most of the classes that were originally in the public.css stylesheet were just transferred over into the ejs files for each page, besides the ones that were related to the functions of app.js.
+
+### MongoDB Integration
+
+Replaced the previous JSON file-based data storage with MongoDB using Mongoose. The repository layer now communicates with MongoDB to perform CRUD operations on menu items.
+
+How to see it:
+
+- Start the MongoDB database.
+- Run the application using `npm start`.
+- Open the application and create, update, or delete a menu item.
+- The changes are saved in MongoDB and persist after restarting the application.
+
+### System Diagram
+
+![System Diagram Image](./systemDiagrams/sprint3.png)
 
 ### Design Decisions:
 
