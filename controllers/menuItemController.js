@@ -1,19 +1,19 @@
-import * as service from '../services/menuItemService.js';
-import { DINING_HALLS, getDiningHallName } from '../dtos/menuitemdto.js';
+import * as service from "../services/menuItemService.js";
+import { DINING_HALLS, getDiningHallName } from "../dtos/menuitemdto.js";
 
-const isHtmx = (req) => req.get('HX-Request') === 'true';
+const isHtmx = (req) => req.get("HX-Request") === "true";
 
 const toRow = (item, index) => ({
   id: item.id ?? item._id?.toString() ?? index,
   name: item.name,
   diningHallId: item.diningHallId,
-  hallName: getDiningHallName(item.diningHallId) ?? 'Unknown hall',
+  hallName: getDiningHallName(item.diningHallId) ?? "Unknown hall",
   section: item.section,
 });
 
 const renderList = async (res, status = 200) => {
   const items = await service.getAllItems();
-  res.status(status).render('partials/menu-items', {
+  res.status(status).render("partials/menu-items", {
     items: items.map(toRow),
     halls: DINING_HALLS,
   });
@@ -42,8 +42,8 @@ export const update = async (req, res, next) => {
   try {
     const saved = await service.updateItem(req.params.id, req.body);
     if (isHtmx(req)) {
-      return res.render('partials/menu-item', {
-        item: toRow({ ...saved, id: req.params.id }),
+      return res.render("partials/menu-item", {
+        item: toRow({ ...saved.toObject(), id: req.params.id }),
         halls: DINING_HALLS,
       });
     }
