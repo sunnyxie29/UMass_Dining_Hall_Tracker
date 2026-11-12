@@ -83,7 +83,7 @@ How to see it:
 
 ### System Diagram
 
-![System Diagram Image](./systemDiagrams/sprint3.png)
+![System Diagram Image](./systemDiagrams/sprint3-fixed.png)
 
 ### Design Decisions:
 
