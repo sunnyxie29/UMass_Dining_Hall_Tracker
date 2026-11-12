@@ -43,7 +43,7 @@ export const update = async (req, res, next) => {
     const saved = await service.updateItem(req.params.id, req.body);
     if (isHtmx(req)) {
       return res.render("partials/menu-item", {
-        item: toRow({ ...saved.toObject(), id: req.params.id }),
+        item: toRow({ ...saved.toObject ? saved.toObject() : saved, id: req.params.id }),
         halls: DINING_HALLS,
       });
     }
