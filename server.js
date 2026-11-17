@@ -1,11 +1,16 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import menuItemRoutes from "./routes/menuItemRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import { attachUser } from "./middleware/attachUser.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { DINING_HALLS } from "./dtos/menuitemdto.js";
 import connectDB from "./config/database.js";
 
 const app = express();
 const PORT = 3000;
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || "dev-secret-change-in-production";
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -13,6 +18,12 @@ app.use(express.static("public"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser(SESSION_SECRET));
+app.use(attachUser);
+app.use((req, res, next) => {
+  res.locals.user = req.user ?? null;
+  next();
+});
 const dining_halls = [
   { title: "Worcester Dining Hall" },
   { title: "Franklin Dining Hall" },
@@ -36,6 +47,7 @@ app.get("/halls", (req, res) => {
   res.render("halls", { title: "Dining Halls", dining_halls });
 });
 
+app.use("/", authRoutes);
 app.use("/menu-items", menuItemRoutes);
 app.use(errorHandler);
 

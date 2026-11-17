@@ -22,6 +22,27 @@
         class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
         >Menu</a
       >
+      <% if (user) { %>
+        <form method="post" action="/logout" class="inline-block">
+          <button
+            type="submit"
+            class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark cursor-pointer sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
+          >
+            Log out
+          </button>
+        </form>
+      <% } else { %>
+        <a
+          href="/signup"
+          class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
+          >Sign up</a
+        >
+        <a
+          href="/login"
+          class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
+          >Log in</a
+        >
+      <% } %>
     </main>
   </body>
 </html>
