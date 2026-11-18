@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="bg-umass text-white p-5">
+      <h1 class="text-2xl font-bold"><%= title %></h1>
+    </header>
+    <main class="p-5">
+      <form
+        method="post"
+        action="/login"
+        class="flex flex-col gap-3 mb-6 sm:max-w-sm"
+      >
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          value="<%= email %>"
+          class="p-1.5 border border-gray-300 rounded"
+        />
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          class="p-1.5 border border-gray-300 rounded"
+        />
+        <% if (error) { %>
+          <p class="text-red-600" role="alert"><%= error %></p>
+        <% } %>
+        <button
+          class="px-2.5 py-1.5 border border-green-700 text-green-700 bg-white hover:bg-green-50 rounded cursor-pointer"
+          type="submit"
+        >
+          Log in
+        </button>
+      </form>
+      <p class="mb-4">
+        No account yet? <a href="/signup" class="underline">Sign up</a>
+      </p>
+      <a
+        href="/"
+        class="block w-full text-center mb-2 bg-umass text-white px-3 py-1.5 rounded hover:bg-umass-dark sm:inline-block sm:w-auto sm:mb-0 sm:mr-2.5"
+        >Back</a
+      >
+    </main>
+  </body>
+</html>
