@@ -31,15 +31,6 @@
           name="password"
           class="p-1.5 border border-gray-300 rounded"
         />
-        <label for="role">Account type</label>
-        <select
-          id="role"
-          name="role"
-          class="p-1.5 border border-gray-300 rounded"
-        >
-          <option value="member" selected>Member</option>
-          <option value="admin">Admin</option>
-        </select>
         <% if (error) { %>
           <p class="text-red-600" role="alert"><%= error %></p>
         <% } %>

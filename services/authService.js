@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import * as repository from "../repositories/userRepository.js";
 import { toUserDto } from "../dtos/userDto.js";
 
-const ROLES = ["member", "admin"];
 const MIN_PASSWORD_LENGTH = 8;
 const SALT_ROUNDS = 10;
 const DUPLICATE_KEY_CODE = 11000;
@@ -12,18 +11,16 @@ const fail = (status, message) => Object.assign(new Error(message), { status });
 
 const normalizeEmail = (email) => (email || "").trim().toLowerCase();
 
-const validate = ({ email, password, role }) => {
+const validate = ({ email, password }) => {
   if (!email || !email.trim()) throw fail(400, "Email is required.");
   if (!/^\S+@\S+\.\S+$/.test(email.trim()))
     throw fail(400, "Please enter a valid email address.");
   if (!password || password.length < MIN_PASSWORD_LENGTH)
     throw fail(400, "Password must be at least 8 characters.");
-  if (!ROLES.includes(role)) throw fail(400, "Role must be member or admin.");
 };
 
 export const signUp = async (input) => {
-  const role = input.role || "member";
-  validate({ ...input, role });
+  validate(input);
 
   const email = normalizeEmail(input.email);
   const existing = await repository.findByEmail(email);
@@ -32,7 +29,7 @@ export const signUp = async (input) => {
   const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);
 
   try {
-    const user = await repository.create({ email, passwordHash, role });
+    const user = await repository.create({ email, passwordHash, role: "member" });
     return toUserDto(user);
   } catch (err) {
     if (err.code === DUPLICATE_KEY_CODE)
@@ -54,5 +51,17 @@ export const login = async (input) => {
 export const getCurrentUser = async (id) => {
   const user = await repository.findById(id);
   if (!user) throw fail(401, "Not logged in.");
+  return toUserDto(user);
+};
+
+export const ensureAdmin = async (input) => {
+  validate(input);
+
+  const email = normalizeEmail(input.email);
+  const existing = await repository.findByEmail(email);
+  if (existing) return null;
+
+  const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);
+  const user = await repository.create({ email, passwordHash, role: "admin" });
   return toUserDto(user);
 };

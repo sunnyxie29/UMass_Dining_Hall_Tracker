@@ -25,7 +25,8 @@ const makeRes = () => {
 };
 
 const adminUser = { id: 'u1', email: 'student@umass.edu', role: 'admin' };
-const body = { email: 'student@umass.edu', password: 'password123', role: 'admin' };
+const memberUser = { id: 'u2', email: 'student@umass.edu', role: 'member' };
+const body = { email: 'student@umass.edu', password: 'password123' };
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -51,7 +52,7 @@ describe('showSignUp and showLogin', () => {
 
 describe('signUp', () => {
   test('starts a signed httpOnly session cookie and redirects to the menu', async () => {
-    service.signUp.mockResolvedValue(adminUser);
+    service.signUp.mockResolvedValue(memberUser);
     const res = makeRes();
 
     await controller.signUp(makeReq({ body }), res, jest.fn());
@@ -64,14 +65,14 @@ describe('signUp', () => {
     expect(res.redirect).toHaveBeenCalledWith('/menu');
   });
 
-  test('stores the new user id and role in the session behind that cookie', async () => {
-    service.signUp.mockResolvedValue(adminUser);
+  test('stores the new member id and role in the session behind that cookie', async () => {
+    service.signUp.mockResolvedValue(memberUser);
     const res = makeRes();
 
     await controller.signUp(makeReq({ body }), res, jest.fn());
 
     const sessionId = res.cookie.mock.calls[0][1];
-    expect(getSession(sessionId)).toEqual({ userId: 'u1', role: 'admin' });
+    expect(getSession(sessionId)).toEqual({ userId: 'u2', role: 'member' });
   });
 
   test('re-renders the form with the message and typed email on a 400', async () => {

@@ -18,7 +18,6 @@ const validInput = { email: 'student@umass.edu', password: 'password123', role: 
 const EMAIL_REQUIRED = 'Email is required.';
 const EMAIL_INVALID = 'Please enter a valid email address.';
 const PASSWORD_ERROR = 'Password must be at least 8 characters.';
-const ROLE_ERROR = 'Role must be member or admin.';
 const LOGIN_ERROR = 'Incorrect email or password.';
 
 const storedUser = {
@@ -35,7 +34,6 @@ const invalidInputs = [
   ['an email without a domain', { ...validInput, email: 'student@' }, EMAIL_INVALID],
   ['a missing password', { ...validInput, password: undefined }, PASSWORD_ERROR],
   ['a password that is too short', { ...validInput, password: 'short' }, PASSWORD_ERROR],
-  ['an unknown role', { ...validInput, role: 'superuser' }, ROLE_ERROR],
 ];
 
 beforeEach(() => {
@@ -65,16 +63,16 @@ describe('signUp success', () => {
     expect(repository.create).toHaveBeenCalledTimes(1);
   });
 
-  test('defaults to the member role when none is given', async () => {
-    await service.signUp({ email: validInput.email, password: validInput.password });
+  test('always creates a member, even when the request asks for admin', async () => {
+    await service.signUp({ ...validInput, role: 'admin' });
 
     expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({ role: 'member' }));
   });
 
-  test('accepts the admin role', async () => {
-    await service.signUp({ ...validInput, role: 'admin' });
+  test('creates a member when no role is given', async () => {
+    await service.signUp({ email: validInput.email, password: validInput.password });
 
-    expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }));
+    expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({ role: 'member' }));
   });
 
   test('trims and lowercases the email before looking it up and saving it', async () => {
@@ -213,5 +211,49 @@ describe('getCurrentUser', () => {
       status: 401,
       message: 'Not logged in.',
     });
+  });
+});
+
+describe('ensureAdmin', () => {
+  test('creates the admin account when it does not exist yet', async () => {
+    await expect(
+      service.ensureAdmin({ email: 'admin@umass.edu', password: 'admin1234' }),
+    ).resolves.toEqual({ id: 'u1', email: 'admin@umass.edu', role: 'admin' });
+
+    expect(repository.create).toHaveBeenCalledWith({
+      email: 'admin@umass.edu',
+      passwordHash: 'hashed-password',
+      role: 'admin',
+    });
+  });
+
+  test('hashes the admin password and never saves it as plain text', async () => {
+    await service.ensureAdmin({ email: 'admin@umass.edu', password: 'admin1234' });
+
+    expect(bcrypt.hash).toHaveBeenCalledWith('admin1234', expect.any(Number));
+    expect(repository.create.mock.calls[0][0]).not.toHaveProperty('password');
+  });
+
+  test('trims and lowercases the admin email', async () => {
+    await service.ensureAdmin({ email: '  Admin@UMass.edu ', password: 'admin1234' });
+
+    expect(repository.findByEmail).toHaveBeenCalledWith('admin@umass.edu');
+  });
+
+  test('does nothing when the admin account already exists', async () => {
+    repository.findByEmail.mockResolvedValue({ ...storedUser, email: 'admin@umass.edu' });
+
+    await expect(
+      service.ensureAdmin({ email: 'admin@umass.edu', password: 'admin1234' }),
+    ).resolves.toBeNull();
+    expect(repository.create).not.toHaveBeenCalled();
+    expect(bcrypt.hash).not.toHaveBeenCalled();
+  });
+
+  test('rejects a password that is too short and creates nothing', async () => {
+    await expect(
+      service.ensureAdmin({ email: 'admin@umass.edu', password: 'short' }),
+    ).rejects.toMatchObject({ status: 400, message: PASSWORD_ERROR });
+    expect(repository.create).not.toHaveBeenCalled();
   });
 });

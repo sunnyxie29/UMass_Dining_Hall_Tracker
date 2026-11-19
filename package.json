@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node --env-file-if-exists=.env server.js",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/style.css"
   },
@@ -31,9 +31,5 @@
     "@tailwindcss/cli": "^4.1.0",
     "jest": "^30.5.2",
     "tailwindcss": "^4.1.0"
-  },
-  "allowScripts": {
-    "@parcel/watcher@2.6.0": true,
-    "bcrypt@6.0.0": true
   }
 }

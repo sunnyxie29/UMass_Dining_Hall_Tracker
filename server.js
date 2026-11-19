@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import express from "express";
 import cookieParser from "cookie-parser";
 import menuItemRoutes from "./routes/menuItemRoutes.js";
@@ -6,11 +7,12 @@ import { attachUser } from "./middleware/attachUser.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { DINING_HALLS } from "./dtos/menuitemdto.js";
 import connectDB from "./config/database.js";
+import { ensureAdmin } from "./services/authService.js";
 
 const app = express();
 const PORT = 3000;
-const SESSION_SECRET =
-  process.env.SESSION_SECRET || "dev-secret-change-in-production";
+const SESSION_SECRET = process.env.SESSION_SECRET || randomUUID();
+const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env;
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -54,6 +56,18 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB();
+
+    if (ADMIN_EMAIL && ADMIN_PASSWORD) {
+      const admin = await ensureAdmin({
+        email: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD,
+      });
+      if (admin) console.log(`Created admin account ${admin.email}`);
+    } else {
+      console.warn(
+        "No admin account created: set ADMIN_EMAIL and ADMIN_PASSWORD in .env",
+      );
+    }
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);
