@@ -1,4 +1,5 @@
 import * as repository from "../repositories/menuItemRepository.js";
+import mongoose from "mongoose";
 
 const fail = (status, message) => Object.assign(new Error(message), { status });
 
@@ -21,6 +22,12 @@ const validate = ({ name, diningHallId, section }) => {
   if (!section || !section.trim()) throw fail(400, "Section is required.");
 };
 
+const validateObjectId = (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw fail(400, "Invalid menu item ID.");
+  }
+};
+
 const toItem = ({ name, diningHallId, section }) => ({
   name: name.trim(),
   diningHallId: Number(diningHallId),
@@ -35,6 +42,7 @@ export const createItem = async (input, userId) => {
 };
 
 export const updateItem = async (id, input, user) => {
+  validateObjectId(id);
   validate(input);
   const item = await repository.findById(id);
   if (!item) throw fail(404, "Menu item not found.");
@@ -44,6 +52,7 @@ export const updateItem = async (id, input, user) => {
 };
 
 export const deleteItem = async (id, user) => {
+  validateObjectId(id);
   const item = await repository.findById(id);
   if (!item) throw fail(404, "Menu item not found.");
   authorizeItem(item, user);
