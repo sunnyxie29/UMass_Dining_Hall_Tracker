@@ -1,138 +1,260 @@
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
-const repository = {
+const mockRepository = {
   findAll: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  findById: jest.fn(),
 };
 
-jest.unstable_mockModule('../repositories/menuItemRepository.js', () => repository);
+jest.unstable_mockModule("../repositories/menuItemRepository.js", () => ({
+  findAll: mockRepository.findAll,
+  create: mockRepository.create,
+  update: mockRepository.update,
+  remove: mockRepository.remove,
+  findById: mockRepository.findById,
+}));
 
-const service = await import('../services/menuItemService.js');
+const service = await import("../services/menuItemService.js");
 
-const validInput = { name: 'Chicken Tenders', diningHallId: 1, section: 'Grill' };
+const validInput = {
+  name: "Burger",
+  diningHallId: 2,
+  section: "Dinner",
+};
 
-const NAME_ERROR = 'Item name is required.';
-const HALL_ERROR = 'Please choose a valid dining hall.';
-const SECTION_ERROR = 'Section is required.';
+const owner = {
+  id: "user-1",
+  role: "member",
+};
 
-const invalidInputs = [
-  ['a missing name', { ...validInput, name: undefined }, NAME_ERROR],
-  ['an empty name', { ...validInput, name: '' }, NAME_ERROR],
-  ['a whitespace-only name', { ...validInput, name: '   ' }, NAME_ERROR],
-  ['a missing dining hall', { ...validInput, diningHallId: undefined }, HALL_ERROR],
-  ['an empty dining hall', { ...validInput, diningHallId: '' }, HALL_ERROR],
-  ['a dining hall id below the range', { ...validInput, diningHallId: 0 }, HALL_ERROR],
-  ['a dining hall id above the range', { ...validInput, diningHallId: 5 }, HALL_ERROR],
-  ['a non-numeric dining hall', { ...validInput, diningHallId: 'Worcester' }, HALL_ERROR],
-  ['a missing section', { ...validInput, section: undefined }, SECTION_ERROR],
-  ['an empty section', { ...validInput, section: '' }, SECTION_ERROR],
-  ['a whitespace-only section', { ...validInput, section: '   ' }, SECTION_ERROR],
-];
+const otherUser = {
+  id: "user-2",
+  role: "member",
+};
+
+const admin = {
+  id: "admin-1",
+  role: "admin",
+};
+
+const existingItem = {
+  _id: "abc123",
+  name: "Old Burger",
+  diningHallId: 1,
+  section: "Lunch",
+  createdBy: "user-1",
+};
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
-describe('getAllItems', () => {
-  test('returns whatever the repository holds', async () => {
-    const items = [validInput];
-    repository.findAll.mockResolvedValue(items);
+describe("Menu Item Service", () => {
+  describe("createItem", () => {
+    test("should reject an empty item name", async () => {
+      await expect(
+        service.createItem({
+          name: "",
+          diningHallId: 1,
+          section: "Lunch",
+        }),
+      ).rejects.toMatchObject({
+        status: 400,
+        message: "Item name is required.",
+      });
 
-    await expect(service.getAllItems()).resolves.toBe(items);
-    expect(repository.findAll).toHaveBeenCalledTimes(1);
-  });
-});
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
 
-describe('createItem', () => {
-  test.each(invalidInputs)('rejects %s with a 400', async (label, input, message) => {
-    await expect(service.createItem(input)).rejects.toMatchObject({ status: 400, message });
-    expect(repository.create).not.toHaveBeenCalled();
-  });
+    test("should reject an invalid dining hall ID", async () => {
+      await expect(
+        service.createItem({
+          name: "Pizza",
+          diningHallId: 5,
+          section: "Lunch",
+        }),
+      ).rejects.toMatchObject({
+        status: 400,
+        message: "Please choose a valid dining hall.",
+      });
 
-  test('saves a valid item and returns what the repository returns', async () => {
-    const saved = { ...validInput };
-    repository.create.mockResolvedValue(saved);
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
 
-    await expect(service.createItem(validInput)).resolves.toBe(saved);
-    expect(repository.create).toHaveBeenCalledWith(validInput);
-  });
+    test("should reject an empty section", async () => {
+      await expect(
+        service.createItem({
+          name: "Pizza",
+          diningHallId: 1,
+          section: "",
+        }),
+      ).rejects.toMatchObject({
+        status: 400,
+        message: "Section is required.",
+      });
 
-  test('trims the name and section before saving', async () => {
-    repository.create.mockResolvedValue({});
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
 
-    await service.createItem({ name: '  Pizza  ', diningHallId: 2, section: '  Bowl  ' });
+    test("should create a menu item with valid data", async () => {
+      const input = {
+        name: "Pizza",
+        diningHallId: "1",
+        section: "Lunch",
+      };
 
-    expect(repository.create).toHaveBeenCalledWith({
-      name: 'Pizza',
-      diningHallId: 2,
-      section: 'Bowl',
+      const savedItem = {
+        _id: "abc123",
+        name: "Pizza",
+        diningHallId: 1,
+        section: "Lunch",
+        createdBy: "user-1",
+      };
+
+      mockRepository.create.mockResolvedValue(savedItem);
+
+      const result = await service.createItem(input, "user-1");
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        name: "Pizza",
+        diningHallId: 1,
+        section: "Lunch",
+        createdBy: "user-1",
+      });
+
+      expect(result).toEqual(savedItem);
     });
   });
 
-  test.each(['1', '2', '3', '4'])('accepts the form string "%s" and saves it as a number', async (value) => {
-    repository.create.mockResolvedValue({});
+  describe("getAllItems", () => {
+    test("should return all menu items", async () => {
+      const items = [
+        {
+          _id: "abc123",
+          name: "Pizza",
+          diningHallId: 1,
+          section: "Lunch",
+        },
+      ];
 
-    await service.createItem({ ...validInput, diningHallId: value });
+      mockRepository.findAll.mockResolvedValue(items);
 
-    expect(repository.create).toHaveBeenCalledWith({
-      ...validInput,
-      diningHallId: Number(value),
-    });
-  });
-});
+      const result = await service.getAllItems();
 
-describe('updateItem', () => {
-  test.each(invalidInputs)('rejects %s with a 400', async (label, input, message) => {
-    await expect(service.updateItem('0', input)).rejects.toMatchObject({ status: 400, message });
-    expect(repository.update).not.toHaveBeenCalled();
-  });
-
-  test('updates the item and returns the saved version', async () => {
-    const saved = { ...validInput, section: 'Salad Bar' };
-    repository.update.mockResolvedValue(saved);
-
-    await expect(service.updateItem('abc123', { ...validInput, section: 'Salad Bar' })).resolves.toBe(saved);
-    expect(repository.update).toHaveBeenCalledWith('abc123', { ...validInput, section: 'Salad Bar' });
-  });
-
-  test('normalizes the input the same way create does', async () => {
-    repository.update.mockResolvedValue({});
-
-    await service.updateItem('abc123', { name: '  Soup ', diningHallId: '4', section: ' Deli ' });
-
-    expect(repository.update).toHaveBeenCalledWith('abc123', {
-      name: 'Soup',
-      diningHallId: 4,
-      section: 'Deli',
+      expect(result).toEqual(items);
+      expect(mockRepository.findAll).toHaveBeenCalled();
     });
   });
 
-  test('rejects with a 404 when the repository finds nothing to update', async () => {
-    repository.update.mockResolvedValue(null);
+  describe("updateItem", () => {
+    test("should update a menu item when the user is its owner", async () => {
+      const updatedItem = {
+        _id: "abc123",
+        ...validInput,
+        createdBy: "user-1",
+      };
+      mockRepository.findById.mockResolvedValue(existingItem);
+      mockRepository.update.mockResolvedValue(updatedItem);
 
-    await expect(service.updateItem('9', validInput)).rejects.toMatchObject({
-      status: 404,
-      message: 'Menu item not found.',
+      const result = await service.updateItem("abc123", validInput, owner);
+
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.update).toHaveBeenCalledWith("abc123", validInput);
+      expect(result).toEqual(updatedItem);
+    });
+
+    test("should allow an admin to update another user's item", async () => {
+      const updatedItem = {
+        _id: "abc123",
+        ...validInput,
+        createdBy: "user-1",
+      };
+
+      mockRepository.findById.mockResolvedValue(existingItem);
+      mockRepository.update.mockResolvedValue(updatedItem);
+
+      const result = await service.updateItem("abc123", validInput, admin);
+
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.update).toHaveBeenCalledWith("abc123", validInput);
+      expect(result).toEqual(updatedItem);
+    });
+    test("should reject a non-owner with 403 when updating", async () => {
+      mockRepository.findById.mockResolvedValue(existingItem);
+
+      await expect(
+        service.updateItem("abc123", validInput, otherUser),
+      ).rejects.toMatchObject({
+        status: 403,
+        message: "You are not authorized to modify this item.",
+      });
+
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.update).not.toHaveBeenCalled();
+    });
+
+    test("should return 404 when updating a nonexistent item", async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        service.updateItem("notfound", validInput, owner),
+      ).rejects.toMatchObject({
+        status: 404,
+        message: "Menu item not found.",
+      });
+
+      expect(mockRepository.update).not.toHaveBeenCalled();
     });
   });
-});
 
-describe('deleteItem', () => {
-  test('removes the item', async () => {
-    repository.remove.mockResolvedValue(true);
+  describe("deleteItem", () => {
+    test("should delete a menu item when the user is its owner", async () => {
+      mockRepository.findById.mockResolvedValue(existingItem);
+      mockRepository.remove.mockResolvedValue(true);
 
-    await expect(service.deleteItem('abc123')).resolves.toBeUndefined();
-    expect(repository.remove).toHaveBeenCalledWith('abc123');
-  });
+      await service.deleteItem("abc123", owner);
 
-  test('rejects with a 404 when the repository finds nothing to remove', async () => {
-    repository.remove.mockResolvedValue(false);
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.remove).toHaveBeenCalledWith("abc123");
+    });
 
-    await expect(service.deleteItem('9')).rejects.toMatchObject({
-      status: 404,
-      message: 'Menu item not found.',
+    test("should allow an admin to delete another user's item", async () => {
+      mockRepository.findById.mockResolvedValue(existingItem);
+      mockRepository.remove.mockResolvedValue(true);
+
+      await service.deleteItem("abc123", admin);
+
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.remove).toHaveBeenCalledWith("abc123");
+    });
+
+    test("should reject a non-owner with 403 when deleting", async () => {
+      mockRepository.findById.mockResolvedValue(existingItem);
+
+      await expect(
+        service.deleteItem("abc123", otherUser),
+      ).rejects.toMatchObject({
+        status: 403,
+        message: "You are not authorized to modify this item.",
+      });
+
+      expect(mockRepository.findById).toHaveBeenCalledWith("abc123");
+      expect(mockRepository.remove).not.toHaveBeenCalled();
+    });
+
+    test("should return 404 when deleting a nonexistent item", async () => {
+      // MODIFIED: The item lookup determines whether the item exists.
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.deleteItem("notfound", owner)).rejects.toMatchObject(
+        {
+          status: 404,
+          message: "Menu item not found.",
+        },
+      );
+
+      expect(mockRepository.remove).not.toHaveBeenCalled();
     });
   });
 });

@@ -33,6 +33,13 @@ const dining_halls = [
   { title: "Hampshire Dining Hall" },
 ];
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Server is running",
+  });
+});
+
 app.get("/", (req, res) => {
   res.render("home", {
     title: "UMass Dining Hall Tracker",
