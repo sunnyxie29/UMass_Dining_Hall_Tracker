@@ -2,30 +2,104 @@
 
 A web app for tracking dining hall menu items across campus.
 
-## Setup Instructions:
-
-```bash
-gh repo clone timdrichards/cargo
-(follows the instruction in readme to setup the coding environment, including opening dev container and change .env.example to .env)
-cd work
-gh repo clone sunnyxie29/UMass_Dining_Hall_Tracker
-cd UMass_Dining_Hall_Tracker
-npm install
-npm start
-```
-
-Then open http://localhost:3000
-Requires Node.js.
-
 | Name          | Github      |
 | ------------- | ----------- |
 | Sunny Xie     | sunnyxie29  |
 | Thomas Draghi | umassmilker |
 | Mark Kulmizev | mkulmizev   |
 
-## SPRINT 3:
+## Setup Instructions:
 
-### HTMX Interaction
+### Prerequisites
+
+- Git
+- Docker Desktop
+- Visual Studio Code
+- VS Code Dev Containers extension
+
+### 1. Set up the development environment
+
+This project uses the course-provided [Cargo development environment](https://github.com/timdrichards/cargo), which provides the development container and required services, including MongoDB.
+
+Clone the Cargo repository:
+
+```bash
+gh repo clone timdrichards/cargo
+```
+
+Follow the Cargo README to configure the development environment and reopen the workspace in the Dev Container.
+
+### 2. Clone this project
+
+Inside the Cargo workspace, navigate to the `work` directory and clone this repository:
+
+```bash
+cd work
+gh repo clone sunnyxie29/UMass_Dining_Hall_Tracker
+cd UMass_Dining_Hall_Tracker
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root using the provided `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Configure the required environment variables before starting the application.
+Update the environment variables with your own configuration:
+MONGODB_URI: MongoDB connection string
+ADMIN_EMAIL: Email address for the initial admin account
+ADMIN_PASSWORD: Password for the initial admin account
+SESSION_SECRET: Secret used to sign session cookies
+
+Do not commit `.env` to GitHub.
+
+### 5. Start the application
+
+```bash
+npm start
+```
+
+Open `http://localhost:3000` in your browser.
+
+### 6. Run tests
+
+```bash
+npm test
+```
+
+Then open http://localhost:3000
+Requires Node.js.
+
+## Course-Related Sprint Documentation (Not Required for Setup)
+
+### SPRINT 4:
+
+#### Sign Up and Log In
+
+#### Role-Based Authorization
+
+#### Accessibility Improvements
+
+#### Health Check
+
+#### Design Decisions
+
+Sunny Xie:
+Thomas Draghi:
+Mark Kulmizev:
+
+### SPRINT 3:
+
+#### HTMX Interaction
 
 The menu page no longer builds its list with hand-written `fetch` calls and DOM updates. `public/app.js` is deleted. Adding, editing, and deleting items are all done with HTMX (`hx-*` attributes in the markup), and the server answers each request with an HTML fragment that HTMX swaps into the page. HTMX is loaded from a CDN, so there is nothing extra to install.
 
@@ -48,7 +122,7 @@ How it works with the existing layers:
 
 Client-facing id that assumed an array position: the old `app.js` stored each row's id as its position in the list (`li.dataset.id = list.children.length`) and re-numbered every row after a delete, because the ids the server understood were array positions. Now the server renders each row's id into its `hx-put` and `hx-delete` URLs, and add and delete respond with the whole refreshed list, so nothing on the client has to track a position. The controller uses the item's `id`, then its `_id`, and only falls back to the array position when neither exists, so the views use the real MongoDB id once the repository returns it.
 
-### Tests
+#### Tests
 
 Run them with:
 
@@ -66,11 +140,11 @@ The repository and service are mocked with `jest.unstable_mockModule`, so no fil
 | `tests/errorHandler.test.js`       | JSON errors for plain requests, a retargeted HTML error for HTMX requests, and the generic message for a 500.                                                                                                                                                                                             |
 | `tests/menuItemViews.test.js`      | The rendered partials contain the expected `hx-delete`, `hx-put`, and `hx-target` values, preselect the right hall, escape item text, and clear the error area.                                                                                                                                           |
 
-### Restyle with Tailwind
+#### Restyle with Tailwind
 
 With the implementation of Tailwind, we we're able to it make so our pages are user friendly on phone-sized screens (375 px) and not just regular sized computer screens (1280 px). When a smaller screen size is detected, the page automatically adjusts by making the interactable portions of the page (as well as the list of the dining halls on the halls page) be stacked vertically on top of each other instead of being side by side. On top of making these adjustments on smaller sized screens to make them usable, some smaller design choices were implemented. All of the buttons now appear as a different color when they are being hovered, not just the reference buttons. Besides that, most of the classes that were originally in the public.css stylesheet were just transferred over into the ejs files for each page, besides the ones that were related to the functions of app.js.
 
-### MongoDB Integration
+#### MongoDB Integration
 
 Replaced the previous JSON file-based data storage with MongoDB using Mongoose. The repository layer now communicates with MongoDB to perform CRUD operations on menu items.
 
@@ -81,11 +155,11 @@ How to see it:
 - Open the application and create, update, or delete a menu item.
 - The changes are saved in MongoDB and persist after restarting the application.
 
-### System Diagram
+#### System Diagram
 
 ![System Diagram Image](./systemDiagrams/sprint3-fixed.png)
 
-### Design Decisions:
+#### Design Decisions:
 
 Sunny Xie:
 We decided to use Mongoose to migrate our data from JSON files to MongoDB. Another option would have been to continue storing data in JSON files and manually manage updates to those files. We chose MongoDB because it offers more automatically generated IDs and built-in database operations. This will make it easier to add search functionality in the future, and editing or deleting individual menu items will no longer require renumbering. Additionally, this change can be implemented quickly because we previously organized the backend code into layers, so we no longer need to rewrite the entire backend.
@@ -98,11 +172,11 @@ One decision we had to make when going about the tailwind implementation was ref
 Thomas Draghi:
 For the HTMX conversion, we decided that adding or deleting an item makes the server send back the whole refreshed list, while editing an item sends back only the one updated row. We decided this because our item ids started out as positions in the list, so after a delete every row below it moves up one place, and a page that only removed one row would be left with stale ids in the Edit and Delete buttons of the rows after it. Rebuilding the list from the server means every id on the page is correct after each action, and it let me delete the `renumber` code that `app.js` needed. The alternative of returning only the new row on add and an empty response on delete can still be considered valid though, as it sends less HTML and leaves the rest of the page alone, which would matter for a very long list. Therefore, we sacrifice that smaller response in order to keep the client from ever tracking ids itself, as the menu is short enough that re-rendering it costs very little. Now that the ids are real MongoDB ids, the one-row version would also be safe, so it would be the better choice if the list grew large.
 
-## SPRINT 2:
+### SPRINT 2:
 
-### Feature: Menu Items
+#### Feature: Menu Items
 
-#### What it does
+##### What it does
 
 Users can add dining hall menu items, view them in a list, edit them, and delete them. Each item has three fields (this feature was designed for admins, common users will only have access to the view version):
 
@@ -114,7 +188,7 @@ Users can add dining hall menu items, view them in a list, edit them, and delete
 
 Items are saved in `data/menu-items.json`, so they are still there after the server restarts.
 
-#### How to try it
+##### How to try it
 
 1. Follow the setup instructions at the top of this page.
 2. Then, run this command in your terminal: `npm start`.
@@ -122,7 +196,7 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 4. Use the traversal buttons at the bottom of each page to go between each page (home page, halls page, and menu page).
 5. On the menu page, you may add, edit, and delete food items freely.
 
-#### Routes
+##### Routes
 
 | Method | Path            | Purpose                                         | Success | Errors                           |
 | ------ | --------------- | ----------------------------------------------- | ------- | -------------------------------- |
@@ -133,11 +207,11 @@ Items are saved in `data/menu-items.json`, so they are still there after the ser
 
 All errors are returned as JSON in the form `{ "error": "message" }`, and the page shows the message to the user.
 
-#### System Diagram
+##### System Diagram
 
 ![System Diagram Image](./systemDiagrams/sprint2.png)
 
-#### Design Decisions
+##### Design Decisions
 
 Sunny Xie:
 We’ve designed the repository to be the sole component that reads from and writes to the `data/menu-items.json` file, rather than having the service call `fs` directly. An alternative approach could reduce the number of files: the service reads the file, applies rules, and then writes it back. While this approach works for JSON files, it blurs the distinction between service rules and the location where data is stored. If our team were to migrate to MongoDB in the future, not only would the storage code need to be rewritten, but the server-side code would also have to be rewritten, and we would be unable to test and validate the rules without access to the actual files. With the repository boundary design, however, when the storage method changes, only that file changes, while the server-side code remains unchanged. The cost is one additional file and one extra function call per operation, but I believe this cost is negligible compared to the flexibility we gain.
@@ -147,7 +221,7 @@ Thomas Draghi: For our menu item DTO and app.js, we decided to represent each di
 Mark Kumizev:
 For our menu.ejs template, we decided to make each item's dining hall and section values appear less significant (did this by making the font smaller, made the text more gray) as compared to the actual name of the dish. We decided to do this because if the items' every field had the same styling the list, the items would basically appear as just being sentences (for example: Chicken Tenders Worcester Lunch). Therefore, in an effort to present each item in a more clean way, we went down this route. The alternative of keeping the styling the same across all fields can still be considered as being valid though, as all the fields carry important information and we don't wanna give an impression that this isn't the case. Therefore, we sacrifice this way of preventing that misconception in order to present the items in a more clean way, as it should already be obvious that all fields carry important information.
 
-## SPRINT 0 & 1:
+### SPRINT 0 & 1:
 
 Working Agreement:
 
