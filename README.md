@@ -76,9 +76,6 @@ Open `http://localhost:3000` in your browser.
 npm test
 ```
 
-Then open http://localhost:3000
-Requires Node.js.
-
 ## Course-Related Sprint Documentation (Not Required for Setup)
 
 ### SPRINT 4:
