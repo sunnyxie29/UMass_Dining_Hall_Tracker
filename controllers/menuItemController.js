@@ -1,7 +1,10 @@
 import * as service from "../services/menuItemService.js";
 import { DINING_HALLS, getDiningHallName } from "../dtos/menuitemdto.js";
 
-const isHtmx = (req) => req.get("HX-Request") === "true";
+const isHtmx = (req) =>
+  (typeof req.get === "function"
+    ? req.get("HX-Request")
+    : req.headers?.["hx-request"]) === "true";
 
 const toRow = (item, index) => ({
   id: item.id ?? item._id?.toString() ?? index,
@@ -30,7 +33,7 @@ export const list = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
   try {
-    const saved = await service.createItem(req.body);
+    const saved = await service.createItem(req.body, req.user.id);
     if (isHtmx(req)) return await renderList(res, 201);
     res.status(201).json(saved);
   } catch (err) {
@@ -40,10 +43,13 @@ export const create = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const saved = await service.updateItem(req.params.id, req.body);
+    const saved = await service.updateItem(req.params.id, req.body, req.user);
     if (isHtmx(req)) {
       return res.render("partials/menu-item", {
-        item: toRow({ ...saved.toObject ? saved.toObject() : saved, id: req.params.id }),
+        item: toRow({
+          ...(saved.toObject ? saved.toObject() : saved),
+          id: req.params.id,
+        }),
         halls: DINING_HALLS,
       });
     }
@@ -55,7 +61,7 @@ export const update = async (req, res, next) => {
 
 export const remove = async (req, res, next) => {
   try {
-    await service.deleteItem(req.params.id);
+    await service.deleteItem(req.params.id, req.user);
     if (isHtmx(req)) return await renderList(res);
     res.status(204).end();
   } catch (err) {
