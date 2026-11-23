@@ -54,11 +54,13 @@ cp .env.example .env
 ```
 
 Configure the required environment variables before starting the application.
+
 Update the environment variables with your own configuration:
-MONGODB_URI: MongoDB connection string
-ADMIN_EMAIL: Email address for the initial admin account
-ADMIN_PASSWORD: Password for the initial admin account
-SESSION_SECRET: Secret used to sign session cookies
+
+- MONGODB_URI: MongoDB connection string
+- ADMIN_EMAIL: Email address for the initial admin account
+- ADMIN_PASSWORD: Password for the initial admin account
+- SESSION_SECRET: Secret used to sign session cookies
 
 Do not commit `.env` to GitHub.
 
@@ -84,14 +86,51 @@ npm test
 
 #### Role-Based Authorization
 
+The application enforces the following authorization rule:
+
+- Only the creator of a menu item or an admin can update or delete it.
+- Unauthenticated users cannot create, update, or delete menu items.
+- Unauthorized users receive a `403 Forbidden` response, while unauthenticated requests receive a `401 Unauthorized` response.
+
+How to test authorization:
+
+1. Create two separate user accounts (Account A and Account B).
+2. Log in as Account A and create a menu item.
+3. Log out and log in as Account B.
+4. Attempt to update or delete the menu item created by Account A.
+5. Verify that the request is rejected with a `403 Forbidden` response.
+6. Log back in as Account A and verify that the owner can successfully update or delete the item.
+7. Log in as an admin and verify that the admin can also update or delete the item.
+
 #### Accessibility Improvements
 
 #### Health Check
 
+The application provides a health check endpoint to verify that the server is running.
+Endpoint:
+
+```http
+GET /health
+```
+
+Example request:
+
+```bash
+curl http://localhost:3000/health
+```
+
+Expected response:
+
+- HTTP status: `200 OK`
+- A JSON response indicating that the server is running successfully.
+
 #### Design Decisions
 
 Sunny Xie:
+We chose to enforce resource ownership and administrator authorization at the service layer, rather than implementing ownership checks directly in route handlers or controllers. An alternative approach would be to create route-level authorization middleware that loads the requested menu item and checks whether the current user is its owner or an administrator before allowing the request to proceed. We chose the service-layer approach because authorization is closely tied to the business rules governing menu item operations. Keeping these checks at the service layer ensures that update and delete operations consistently follow the same ownership rules, regardless of which controller or route invokes them. Furthermore, the alternative approach would require additional middleware and could lead to duplication of resource-loading and authorization logic across different routes. Additionally, maintaining the rules would become more difficult as more operations or entry points are added.
+
 Thomas Draghi:
+
 Mark Kulmizev:
 
 ### SPRINT 3:
