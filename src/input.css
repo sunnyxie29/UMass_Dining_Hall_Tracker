@@ -46,10 +46,10 @@
 
   .delete-btn {
     padding: 0.3rem 0.6rem;
-    border: 1px solid #d33;
+    border: 1px solid #b91c1c;
     border-radius: 4px;
     background: white;
-    color: #d33;
+    color: #b91c1c;
     cursor: pointer;
   }
 
@@ -93,10 +93,10 @@
 
   .cancel-btn {
     padding: 0.3rem 0.6rem;
-    border: 1px solid #d33;
+    border: 1px solid #b91c1c;
     border-radius: 4px;
     background: white;
-    color: #d33;
+    color: #b91c1c;
     cursor: pointer;
   }
 
