@@ -82,6 +82,12 @@ npm test
 
 #### Sign Up and Log In
 
+Visitors can create an account at `/signup` with an email and a password, and log in at `/login`. Every new account is a member, and the role can't be chosen on the form. A successful sign-up or login starts a session and sends the user to the menu, and the Log out button on the home page ends it. Passwords are hashed with bcrypt, and the session is kept in a signed `httpOnly` cookie that the `attachUser` middleware turns into `req.user` with an id and role.
+
+How to see it: run `npm start`, open `http://localhost:3000`, and click Sign up. Submitting with a missing email, an invalid email, a password under 8 characters, or an email that is already registered shows an error on the form, and a wrong password and an unknown email show the same message on login. While logged in, `http://localhost:3000/me` returns your id, email, and role.
+
+The admin account is created on startup from `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`. Tests for the sign-up and login rules, the controller, the sessions, and `attachUser` are in `tests/` and run with `npm test`.
+
 #### Role-Based Authorization
 
 #### Accessibility Improvements
