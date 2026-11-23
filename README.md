@@ -23,6 +23,9 @@ Requires Node.js.
 | Thomas Draghi | umassmilker |
 | Mark Kulmizev | mkulmizev   |
 
+## Sprint 4:
+Thomas Draghi: For sign-up, we decided that the server assigns every new account the member role, and the only admin is one account created on startup from the ADMIN_EMAIL and ADMIN_PASSWORD values in a .env file. We decided this because a role is what the permission checks trust, and if the sign-up form let people choose their own role, anyone could pick admin and add menu items, which would make the admin check pointless. The alternative of letting users choose their role on the form can still be considered valid though, as it needs no seeded account, no environment setup, and makes the app easy to demo. A second alternative was an admin code typed into the sign-up form, which keeps everything in one form but means a shared secret that can leak and be guessed. Therefore, we sacrifice that convenience in order to keep admin access out of reach of the public form, as the extra cost is one .env file and having no way to promote a user from inside the app yet.
+
 ## SPRINT 3:
 
 ### HTMX Interaction
