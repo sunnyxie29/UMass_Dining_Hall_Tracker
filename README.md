@@ -82,6 +82,12 @@ npm test
 
 #### Sign Up and Log In
 
+Visitors can create an account at `/signup` with an email and a password, and log in at `/login`. Every new account is a member, and the role can't be chosen on the form. A successful sign-up or login starts a session and sends the user to the menu, and the Log out button on the home page ends it. Passwords are hashed with bcrypt, and the session is kept in a signed `httpOnly` cookie that the `attachUser` middleware turns into `req.user` with an id and role.
+
+How to see it: run `npm start`, open `http://localhost:3000`, and click Sign up. Submitting with a missing email, an invalid email, a password under 8 characters, or an email that is already registered shows an error on the form, and a wrong password and an unknown email show the same message on login. While logged in, `http://localhost:3000/me` returns your id, email, and role.
+
+The admin account is created on startup from `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`. Tests for the sign-up and login rules, the controller, the sessions, and `attachUser` are in `tests/` and run with `npm test`.
+
 #### Role-Based Authorization
 
 #### Accessibility Improvements
@@ -91,7 +97,9 @@ npm test
 #### Design Decisions
 
 Sunny Xie:
-Thomas Draghi:
+
+Thomas Draghi: Thomas Draghi: For sign-up, we decided that the server assigns every new account the member role, and the only admin is one account created on startup from the ADMIN_EMAIL and ADMIN_PASSWORD values in a .env file. We decided this because a role is what the permission checks trust, and if the sign-up form let people choose their own role, anyone could pick admin and add menu items, which would make the admin check pointless. The alternative of letting users choose their role on the form can still be considered valid though, as it needs no seeded account, no environment setup, and makes the app easy to demo. A second alternative was an admin code typed into the sign-up form, which keeps everything in one form but means a shared secret that can leak and be guessed. Therefore, we sacrifice that convenience in order to keep admin access out of reach of the public form, as the extra cost is one .env file and having no way to promote a user from inside the app yet.
+
 Mark Kulmizev:
 
 ### SPRINT 3:
