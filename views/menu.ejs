@@ -7,6 +7,7 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/style.css" />
     <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+    <script src="/focus.js" defer></script>
   </head>
   <body>
     <header class="bg-umass text-white p-5">
@@ -21,13 +22,17 @@
         hx-swap="innerHTML"
         hx-on::after-request="if (event.detail.successful) this.reset()"
       >
+        <label for="item-name" class="sr-only">Item name</label>
         <input
+          id="item-name"
           type="text"
           name="name"
           placeholder="Name"
           class="p-1.5 border border-gray-300 rounded"
         />
+        <label for="item-hall" class="sr-only">Dining hall</label>
         <select
+          id="item-hall"
           name="diningHallId"
           class="p-1.5 border border-gray-300 rounded"
         >
@@ -36,7 +41,9 @@
             <option value="<%= hall.id %>"><%= hall.name %></option>
           <% }); %>
         </select>
+        <label for="item-section" class="sr-only">Section</label>
         <input
+          id="item-section"
           type="text"
           name="section"
           placeholder="Section"
@@ -52,6 +59,7 @@
       <p id="form-error" class="mb-4 text-red-600" role="alert"></p>
       <ul
         id="items"
+        tabindex="-1"
         class="item-list flex flex-col gap-2 mb-6"
         hx-get="/menu-items"
         hx-trigger="load"

@@ -110,6 +110,8 @@ How to test authorization:
 
 #### Accessibility Improvements
 
+For the accessibility improvements that were done in this sprint, 3 main changes were implemented. First, every input in menu and menu-item.ejs were given labels. This can't be seen directly in the app, but the lines for them can be found above <input> (or <select> for the dining hall drop downs) in the files. Second, the colors for the cancel edit/delete edit buttons were changed to a darker red. I tested every possible color foreground and background combinations in the app by using the built in Digital Color Meter app (MacOS) to get the color codes while running the server, and then checked their ratios with WebAIM's contrast checker (https://webaim.org/resources/contrastchecker/). The cancel edit/delete edit buttons failed when they were being hovered, so I made them have a darker shade of red to fix this. Lastly, public/focus.js was implemented to direct keyboard focus on the menu page. This implementation allowed for keyboard focus to return to the edit button of a respective item after a edit was saved, which previously wasn't in place.
+
 #### Health Check
 
 The application provides a health check endpoint to verify that the server is running.
@@ -142,7 +144,7 @@ We chose to enforce resource ownership and administrator authorization at the se
 Thomas Draghi:
 For sign-up, we decided that the server assigns every new account the member role, and the only admin is one account created on startup from the ADMIN_EMAIL and ADMIN_PASSWORD values in a .env file. We decided this because a role is what the permission checks trust, and if the sign-up form let people choose their own role, anyone could pick admin and add menu items, which would make the admin check pointless. The alternative of letting users choose their role on the form can still be considered valid though, as it needs no seeded account, no environment setup, and makes the app easy to demo. A second alternative was an admin code typed into the sign-up form, which keeps everything in one form but means a shared secret that can leak and be guessed. Therefore, we sacrifice that convenience in order to keep admin access out of reach of the public form, as the extra cost is one .env file and having no way to promote a user from inside the app yet.
 
-Mark Kulmizev:
+Mark Kulmizev: Regarding keyboard focus on the menu page, we had a choice to make when it came to the edit button. We had to decide whether it would make more sense for the focus to revert to the start after an edit was saved, or if it should go back to the edit button of the respective item. When there are not a lot of items on the menu, it could most definitely be seen as good practice to revert focus back to the start, as the most common course of action after editing a item is gonna be to add a new one most of the time. But, when this app is actually being used as it is meant to be, there are gonna be tons of items present in the menu. So, when a admin has to edit multiple different items, it would be an extreme hassle for the focus to revert back like this. So, since the actual practical use of our application better aligns with reverting focus back to the item's edit button, we went down this route.
 
 ### SPRINT 3:
 
