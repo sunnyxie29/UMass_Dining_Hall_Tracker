@@ -130,6 +130,10 @@ Expected response:
 - HTTP status: `200 OK`
 - A JSON response indicating that the server is running successfully.
 
+#### System Diagram
+
+![System Diagram Image](./systemDiagrams/sprint4.png)
+
 #### Design Decisions
 
 Sunny Xie:
